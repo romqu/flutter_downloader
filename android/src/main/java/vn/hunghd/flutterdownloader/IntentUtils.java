@@ -57,7 +57,7 @@ public class IntentUtils {
         }
         if (mime != null) {
             intent = buildIntent(context, file, mime);
-            if (validateIntent(context, intent))
+            // if (validateIntent(context, intent))
                 return intent;
         }
         return null;
@@ -66,13 +66,9 @@ public class IntentUtils {
     private static boolean validateIntent(Context context, Intent intent) {
         PackageManager manager = context.getPackageManager();
         List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
-        if (infos.size() > 0) {
-            //Then there is an Application(s) can handle this intent
-            return true;
-        } else {
-            //No Application can handle this intent
-            return false;
-        }
+        //Then there is an Application(s) can handle this intent
+        //No Application can handle this intent
+        return infos.size() > 0;
     }
 
 }
