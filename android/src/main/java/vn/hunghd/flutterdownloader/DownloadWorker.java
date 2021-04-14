@@ -11,19 +11,18 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.os.Build;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
-
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,9 +43,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -362,14 +358,14 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
                 DownloadTask task = taskDao.loadTask(getId().toString());
                 int progress = isStopped() && task.resumable ? lastProgress : 100;
                 int status = isStopped() ? (task.resumable ? DownloadStatus.PAUSED : DownloadStatus.CANCELED) : DownloadStatus.COMPLETE;
-                int storage = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                // int storage = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 PendingIntent pendingIntent = null;
                 if (status == DownloadStatus.COMPLETE) {
                     if (isImageOrVideoFile(contentType) && isExternalStoragePath(saveFilePath)) {
                         addImageOrVideoToGallery(filename, saveFilePath, getContentTypeWithoutCharset(contentType));
                     }
 
-                    if (clickToOpenDownloadedFile && storage == PackageManager.PERMISSION_GRANTED) {
+                    if (clickToOpenDownloadedFile) {
                         Intent intent = IntentUtils.validatedFileIntent(getApplicationContext(), saveFilePath, contentType);
                         if (intent != null) {
                             log("Setting an intent to open the file " + saveFilePath);
@@ -420,7 +416,7 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
         if (task != null && task.status != DownloadStatus.COMPLETE && !task.resumable) {
             String filename = task.filename;
             if (filename == null) {
-                filename = task.url.substring(task.url.lastIndexOf("/") + 1, task.url.length());
+                filename = task.url.substring(task.url.lastIndexOf("/") + 1);
             }
 
             // check and delete uncompleted file
