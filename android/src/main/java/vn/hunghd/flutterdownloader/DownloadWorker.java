@@ -368,6 +368,7 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
                     if (clickToOpenDownloadedFile) {
                         Intent intent = IntentUtils.validatedFileIntent(getApplicationContext(), saveFilePath, contentType);
                         if (intent != null) {
+                            log("content-type: " + contentType);
                             log("Setting an intent to open the file " + saveFilePath);
                             pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
                         } else {
