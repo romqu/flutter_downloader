@@ -8,8 +8,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Environment;
@@ -438,14 +436,7 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
     }
 
     private int getNotificationIconRes() {
-        try {
-            ApplicationInfo applicationInfo = getApplicationContext().getPackageManager().getApplicationInfo(getApplicationContext().getPackageName(), PackageManager.GET_META_DATA);
-            int appIconResId = applicationInfo.icon;
-            return applicationInfo.metaData.getInt("vn.hunghd.flutterdownloader.NOTIFICATION_ICON", appIconResId);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        return R.drawable.flutter_downloader_notification_icon;
     }
 
     private void setupNotification(Context context) {
