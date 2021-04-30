@@ -188,7 +188,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
         String taskId = request.getId().toString();
         result.success(taskId);
         sendUpdateProgress(taskId, DownloadStatus.ENQUEUED, 0);
-        taskDao.insertOrUpdateNewTask(taskId, url, DownloadStatus.ENQUEUED, 0, filename, savedDir, headers, showNotification, openFileFromNotification);
+        taskDao.insertOrUpdateNewTask(taskId, url, DownloadStatus.ENQUEUED, 0, filename, savedDir, headers, showNotification, openFileFromNotification, fileDisplayName);
     }
 
     private void loadTasks(MethodCall call, MethodChannel.Result result) {
