@@ -257,7 +257,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
                 String partialFilePath = task.savedDir + File.separator + filename;
                 File partialFile = new File(partialFilePath);
                 if (partialFile.exists()) {
-                    WorkRequest request = buildRequest(task.url, task.savedDir, task.filename, task.headers, task.showNotification, task.openFileFromNotification, true, requiresStorageNotLow);
+                    WorkRequest request = buildRequest(task.url, task.savedDir, task.filename, task.headers, task.showNotification, task.openFileFromNotification, true, requiresStorageNotLow, task.fileDisplayName);
                     String newTaskId = request.getId().toString();
                     result.success(newTaskId);
                     sendUpdateProgress(newTaskId, DownloadStatus.RUNNING, task.progress);
@@ -281,7 +281,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
         boolean requiresStorageNotLow = call.argument("requires_storage_not_low");
         if (task != null) {
             if (task.status == DownloadStatus.FAILED || task.status == DownloadStatus.CANCELED) {
-                WorkRequest request = buildRequest(task.url, task.savedDir, task.filename, task.headers, task.showNotification, task.openFileFromNotification, false, requiresStorageNotLow);
+                WorkRequest request = buildRequest(task.url, task.savedDir, task.filename, task.headers, task.showNotification, task.openFileFromNotification, false, requiresStorageNotLow, task.fileDisplayName);
                 String newTaskId = request.getId().toString();
                 result.success(newTaskId);
                 sendUpdateProgress(newTaskId, DownloadStatus.ENQUEUED, task.progress);

@@ -56,7 +56,7 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
     public static final String ARG_FILE_NAME = "file_name";
     public static final String ARG_SAVED_DIR = "saved_file";
     public static final String ARG_HEADERS = "headers";
-    public static final String ARG_FILE_DISPLAY_NAME = "headers";
+    public static final String ARG_FILE_DISPLAY_NAME = "file_display_nameG";
     public static final String ARG_IS_RESUME = "is_resume";
     public static final String ARG_SHOW_NOTIFICATION = "show_notification";
     public static final String ARG_OPEN_FILE_FROM_NOTIFICATION = "open_file_from_notification";
