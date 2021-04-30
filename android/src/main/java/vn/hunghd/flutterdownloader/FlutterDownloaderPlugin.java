@@ -11,6 +11,13 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import androidx.core.app.NotificationManagerCompat;
+import androidx.work.BackoffPolicy;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,14 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import androidx.work.BackoffPolicy;
-import androidx.work.Constraints;
-import androidx.work.Data;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -117,7 +116,15 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
         }
     }
 
-    private WorkRequest buildRequest(String url, String savedDir, String filename, String headers, boolean showNotification, boolean openFileFromNotification, boolean isResume, boolean requiresStorageNotLow) {
+    private WorkRequest buildRequest(String url,
+                                     String savedDir,
+                                     String filename,
+                                     String headers,
+                                     boolean showNotification,
+                                     boolean openFileFromNotification,
+                                     boolean isResume,
+                                     boolean requiresStorageNotLow,
+                                     String fileDisplayName) {
         WorkRequest request = new OneTimeWorkRequest.Builder(DownloadWorker.class)
                 .setConstraints(new Constraints.Builder()
                         .setRequiresStorageNotLow(requiresStorageNotLow)
@@ -130,6 +137,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
                         .putString(DownloadWorker.ARG_SAVED_DIR, savedDir)
                         .putString(DownloadWorker.ARG_FILE_NAME, filename)
                         .putString(DownloadWorker.ARG_HEADERS, headers)
+                        .putString(DownloadWorker.ARG_FILE_DISPLAY_NAME, fileDisplayName)
                         .putBoolean(DownloadWorker.ARG_SHOW_NOTIFICATION, showNotification)
                         .putBoolean(DownloadWorker.ARG_OPEN_FILE_FROM_NOTIFICATION, openFileFromNotification)
                         .putBoolean(DownloadWorker.ARG_IS_RESUME, isResume)
@@ -171,10 +179,11 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
         String savedDir = call.argument("saved_dir");
         String filename = call.argument("file_name");
         String headers = call.argument("headers");
+        String fileDisplayName = call.argument("file_display_name");
         boolean showNotification = call.argument("show_notification");
         boolean openFileFromNotification = call.argument("open_file_from_notification");
         boolean requiresStorageNotLow = call.argument("requires_storage_not_low");
-        WorkRequest request = buildRequest(url, savedDir, filename, headers, showNotification, openFileFromNotification, false, requiresStorageNotLow);
+        WorkRequest request = buildRequest(url, savedDir, filename, headers, showNotification, openFileFromNotification, false, requiresStorageNotLow, fileDisplayName);
         WorkManager.getInstance(context).enqueue(request);
         String taskId = request.getId().toString();
         result.success(taskId);
@@ -243,7 +252,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
             if (task.status == DownloadStatus.PAUSED) {
                 String filename = task.filename;
                 if (filename == null) {
-                    filename = task.url.substring(task.url.lastIndexOf("/") + 1, task.url.length());
+                    filename = task.url.substring(task.url.lastIndexOf("/") + 1);
                 }
                 String partialFilePath = task.savedDir + File.separator + filename;
                 File partialFile = new File(partialFilePath);
@@ -295,7 +304,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
                 String savedDir = task.savedDir;
                 String filename = task.filename;
                 if (filename == null) {
-                    filename = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+                    filename = fileURL.substring(fileURL.lastIndexOf("/") + 1);
                 }
                 String saveFilePath = savedDir + File.separator + filename;
                 Intent intent = IntentUtils.validatedFileIntent(context, saveFilePath, task.mimeType);
@@ -324,7 +333,7 @@ public class FlutterDownloaderPlugin implements MethodCallHandler, FlutterPlugin
             if (shouldDeleteContent) {
                 String filename = task.filename;
                 if (filename == null) {
-                    filename = task.url.substring(task.url.lastIndexOf("/") + 1, task.url.length());
+                    filename = task.url.substring(task.url.lastIndexOf("/") + 1);
                 }
 
                 String saveFilePath = task.savedDir + File.separator + filename;
