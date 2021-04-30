@@ -69,7 +69,8 @@ class FlutterDownloader {
       Map<String, String> headers,
       bool showNotification = true,
       bool openFileFromNotification = true,
-      bool requiresStorageNotLow = true}) async {
+      bool requiresStorageNotLow = true,
+      @required String fileDisplayName}) async {
     assert(_initialized, 'FlutterDownloader.initialize() must be called first');
     assert(Directory(savedDir).existsSync());
 
@@ -91,6 +92,7 @@ class FlutterDownloader {
         'show_notification': showNotification,
         'open_file_from_notification': openFileFromNotification,
         'requires_storage_not_low': requiresStorageNotLow,
+        'file_display_name': fileDisplayName,
       });
       return taskId;
     } on PlatformException catch (e) {
