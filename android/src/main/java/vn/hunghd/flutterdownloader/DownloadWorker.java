@@ -194,7 +194,7 @@ public class DownloadWorker extends Worker implements MethodChannel.MethodCallHa
         }
 
         try {
-            downloadFile(context, url, savedDir, filename, headers, isResume);
+            downloadFile(context, url, savedDir, filename, headers, isResume, fileDisplayName);
             cleanUp();
             dbHelper = null;
             taskDao = null;
